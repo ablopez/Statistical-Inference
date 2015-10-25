@@ -1,0 +1,150 @@
+---
+title: "Project 2 - Analysis Tooth growth in guinea pigs dataset"
+author: "A Lopez"
+date: "20 October 2015"
+
+output: pdf_document
+---
+```{r, echo=FALSE, warning=FALSE,message=FALSE}
+#install.packages("devtools");install.packages("Hmisc")
+library("easyGgplot2", "kassambara");library("pastecs")
+require("ggplot2"); require("Hmisc"); require("easyGgplot2");require("grid");require("devtools")
+```
+# 1.	Load the ToothGrowth data and perform some basic exploratory data analyses 
+```{r, echo=TRUE}
+#Loading required data
+library("datasets")
+data(ToothGrowth)
+toothGrowth <- ToothGrowth 
+#Taking 3 samples from the top and bottom of the dataset:
+head(toothGrowth,n=3); tail(toothGrowth,n=3);
+#Brief analysis of the dataset 
+describe(toothGrowth)
+```
+The dataset contains a data frame with 60 observations associated to 3 variables: length, dose and method of supplying. 
+The basic exploratory analyses shows the response of 10 guinea pigs at each of three dose levels of Vitamin C (0.5, 1, and 2 mg) with each of two delivery methods (orange juice or ascorbic acid), resulting in different length of teeth in each one (min val is 4.2 and higher 33.9).
+To reveal their relationship of such variables, a combination of plots as depicted in plot 1 (see apendix at the end of this)  
+
+The relationship of "supply vs length" and "dose vs length"" are plotted independently in plot 2. 
+Further testing based on Analysis of Variance (ANOVA) is also executed.
+
+The analysis yields the  following results: 
+
+1- The 2 mg dose has larger impact on tooth growth than 1mg and 0.5mg. The 1mg dose has more impact than 0.5mg dose. 
+
+2- The relation of the amount of doses is proportional to the growth. For instance at application of larger doses the growth of teeth results bigger. 
+
+3- The Supplement type has a clear influence too, although the OJ has a greater teeth growth average in combination with dosages 0.5 and 1. The VC supplement and the OJ in combination with dosage 2, present a small difference, that is the mean and the confidence interval are approximate in value.
+
+ANOVA yields the following results: 
+
+ 
+1 - F ratio (1,54) = 12.317; Signifcance, Pr < 0.01: A notable interaction between the length and dose.  
+
+2 - F ratio, (1,54) = 133.415, Pr < 0.01: A clear effect of the supplement  on length.
+
+3 - F ratio (1,54) = 5.33, Pr > 0.01: There is a minor interaction between the combination of dosage + supplement compared to the length. 
+           
+#2.	Provide a basic summary of the data.
+```{r, echo=TRUE}
+# Summary of Dataset and basic stats 
+summary(toothGrowth);stat.desc(toothGrowth)       
+```
+This simple exploratory analysis reveals the supp “OJ” has the better growth rates overall. 
+However, if we look at dose size “2.0” we see that “VC” reaches a larger values than “OJ".
+The results show there is a notable interaction between the length (len) and dosage (dose), being the highest growth of  3.9 at does=2 under the VC supplement. Refer to plot 0.
+
+#3.	Use confidence intervals and/or hypothesis tests to compare tooth growth by supp and dose. 
+
+The following t-Test compares the tooth growth by supp and dose and verifies that for certain dosage levels there is a significant difference in tooth growth between the two supplement types. For each dose level the test verifies where there is a significant difference in tooth growth between VC and OJ supplement types. Please refer to appendix for the data computing. 
+
+Analysis: 
+
+a - With a confidence interval of [1.71, 8,78] for mean(OJ)-mean(VC) at dose level 0.5 mg, the null hypothesis can be rejected as there is a significant difference in tooth length between the two supplement types at this dose level.
+
+b - With a confidence interval of [2.80, 9.05] for mean(OJ)-mean(VC) at dose level 1.0 mg, the null hypothesis can be rejected as there is a significant difference in tooth length between the two supplement types at this dose level.
+
+c - With a confidence interval of [-3.79, 3.63] for mean(OJ)-mean(VC) at dose level 2.0 mg, the null hypothesis can not be rejected as there is not a significant difference in tooth length between the two supplement types at this dose level.
+
+#Conclusion
+
+The analysis of the results yield the following conclusions: 
+For doses of 0.5 and 1.0, OJ has a greater effect on Tooth Growth than VC, 
+We know this by the p.value indicators being less than 5% and the confidence intervals of the test do not contain 0. 
+
+For the test at dose 2.0  Ho can't be rejected, as the p.value is greater than 5% and the confidence test contains 0. 
+
+For the test OJ vs VC we cannot reject the Ho either, as the p.value is 6% (greater than the 5% threshold used for statistical analysis) and the confidence interval contains 0
+
+We can then conclude that to get greater tooth growth with low levels of dosage (0.5 & 1.0) the usage of OJ is recommended as opposed to VC. 
+At greater levels of dosage (e.g 2),  it's possible attain more growth using VC.
+
+Assumptions:  The populations are independent. e.g at least 60 guinea pigs are considered.
+We assume statistical principles are followed, e.g random populations of guinea pigs, the guinea pigs are a uniform population. The researchers were objective, took accurate measurements, and were not biased by any means.
+
+##                    Appendix
+##Section Plots
+
+Plot 0. Scatter plot of len, dose and tooth growth
+
+```{r fig.width=6, fig.height=4.5,echo=FALSE}
+p0 <- ggplot(data=toothGrowth, aes(x=dose,y=len,fill=dose)) +
+#geom_line(aes(), colour="blue") +  # Blue lines
+    geom_point(size=3, colour="red") + 
+  geom_text(data = toothGrowth,aes(label = len,position=2,coulor="black"), vjust = 1.5,size=2, angle=70,coulor="black")+
+  
+  theme(legend.position="fig.5") + 
+  facet_grid(.~supp) 
+p0;
+```
+
+PLOT 1 . Relation of len, dose and supplement type
+
+```{r fig.width=5, fig.height=3,echo=FALSE}
+toothGrowth$dose <- as.factor(toothGrowth$dose) # convert to factor
+p1 <- ggplot(data=toothGrowth, aes(x=dose,y=len,fill=dose)) +
+  geom_boxplot() + 
+  theme(legend.position="none") + 
+  facet_grid(.~supp) 
+
+p2 <- ggplot(data=toothGrowth, aes(x=supp,y=len,fill=supp)) +
+  geom_boxplot() + 
+  theme(legend.position="none") + 
+  facet_grid(.~dose) 
+
+ggplot2.multiplot(p1,p2, cols=2)
+
+```
+
+PLOT 2 . Relation of "len vs supplement" type and "dose vs len""
+
+```{r fig.width=5, fig.height=2.5,echo=FALSE}
+p3 <- ggplot(data=toothGrowth, aes(x=supp,y=len,fill=supp)) +
+  geom_boxplot()
+
+p4 <- ggplot(data=toothGrowth, aes(x=dose,y=len,fill=dose)) +
+  geom_boxplot()
+
+ggplot2.multiplot(p4,p3, cols=2)
+
+```
+
+#Section Computations
+
+##1 -T test computing
+
+```{r, echo=FALSE}
+
+T.dose5 <- subset(ToothGrowth, dose == 0.5)
+T.dose1 <- subset(ToothGrowth, dose == 1.0)
+T.dose2 <- subset(ToothGrowth, dose == 2.0)
+t.test(len ~ supp, paired = F, var.equal = F, data = T.dose5)
+t.test(len ~ supp, paired = F, var.equal = F, data = T.dose1)
+t.test(len ~ supp, paired = F, var.equal = F, data = T.dose2)
+```
+
+##2 -ANOVA analysis
+```{r, echo=FALSE}
+anova.out <- aov(len ~ supp * dose, data=toothGrowth)
+summary(anova.out)
+```{r, echo=FALSE}
