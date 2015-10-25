@@ -1,5 +1,5 @@
 ---
-title: "Exponential Distribution vs Central Limit Theorem"
+title: "Part A-Exponential Distribution vs Central Limit Theorem"
 author: "A Lopez"
 date: "20 October 2015"
 output: pdf_document

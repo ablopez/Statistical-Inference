@@ -1,5 +1,5 @@
 ---
-title: "Project 2 - Analysis Tooth growth in guinea pigs dataset"
+title: "Part B, Analysis - Tooth growth in guinea pigs"
 author: "A Lopez"
 date: "20 October 2015"
 
